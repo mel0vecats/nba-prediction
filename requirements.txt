@@ -9,4 +9,4 @@ SQLAlchemy
 streamlit
 nba_api
 python-dotenv
-psycopg2
+psycopg2-binary
