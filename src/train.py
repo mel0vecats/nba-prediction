@@ -128,7 +128,7 @@ if __name__ == "__main__":
     train_df = train_df.sort_values("GAME_DATE")
 
     target = "PTS"
-    feature_cols = [col for col in train_df.columns if col not in [target,"Game_ID","GAME_DATE","Team_ID","OPP_Team_ID","is_new"]]
+    feature_cols = [col for col in train_df.columns if col not in [target,"Game_ID","GAME_DATE","Team_ID","OPP_Team_ID", "OPP_PTS","is_new"]]
 
     # ---------------------
     # Time-series split

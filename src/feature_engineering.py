@@ -193,7 +193,7 @@ def merge_and_build_dataset(hist_df, upc_df):
 # FINAL FEATURES
 # =========================
 def select_features(df, feature_cols, target="PTS"):
-    cols = feature_cols + [target, "Game_ID", "GAME_DATE", "Team_ID", "OPP_Team_ID", "is_new"]
+    cols = feature_cols + [target, "Game_ID", "GAME_DATE", "Team_ID", "OPP_Team_ID", "OPP_PTS", "is_new"]
     model_df = df[cols].replace([np.inf, -np.inf], np.nan)
 
     model_df = model_df[

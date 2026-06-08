@@ -16,6 +16,7 @@ SELECT
     t1.abbreviation AS "TEAM",
     t2.abbreviation AS "OPP",
     p."PTS",
+    p."OPP_PTS",
     p."Predicted_PTS" as "PREDICTED"
 FROM predictions p
 LEFT JOIN nba_teams t1
@@ -77,14 +78,41 @@ if selected_team:
 filtered_completed["DATE"] = filtered_completed["DATE"].dt.date
 next_games_all["DATE"] = next_games_all["DATE"].dt.date
 
-
-
-# --- Display ---
-next_games_display = next_games_all.drop(columns=["Game_ID", "PTS"])
-completed_games_display = filtered_completed.drop(columns=["Game_ID", "MONTH"])
+#--- Prepare display data ---
+next_games_display = next_games_all.drop(columns=["Game_ID", "PTS", "OPP_PTS"])
+completed_games_display = filtered_completed.drop(columns=["Game_ID", "OPP_PTS", "MONTH"])
 
 completed_games_display = completed_games_display.reset_index(drop=True)
 next_games_display = next_games_display.reset_index(drop=True)
+
+# --- MODEL PERFORMANCE ---
+# WIN ACCURACY
+
+filtered_completed["ACTUAL_WIN"] = (
+    filtered_completed["PTS"] > filtered_completed["OPP_PTS"]
+)
+
+filtered_completed["PRED_WIN"] = (
+    filtered_completed["PREDICTED"] > filtered_completed["OPP_PTS"]
+)
+
+filtered_completed["WIN_CORRECT"] = (
+    filtered_completed["ACTUAL_WIN"] == filtered_completed["PRED_WIN"]
+)
+
+win_accuracy = filtered_completed["WIN_CORRECT"].mean() * 100
+
+
+# MAE
+mae = filtered_completed["DIFFERENCE"].mean()
+
+
+# --- Display ---
+st.subheader("MODEL PERFORMANCE")
+col1, col2 = st.columns(2)
+
+col1.metric("Win Accuracy", f"{round(win_accuracy, 2)}%" if not pd.isna(win_accuracy) else None)
+col2.metric("MAE", round(mae, 2) if not pd.isna(mae) else None)
 
 st.subheader("NEXT GAMES")
 st.dataframe(next_games_display, use_container_width=True)
@@ -92,11 +120,4 @@ st.dataframe(next_games_display, use_container_width=True)
 st.subheader("FINAL RESULTS")
 st.dataframe(completed_games_display, use_container_width=True)
 
-# --- MAE ---
-mae = filtered_completed["DIFFERENCE"].mean()
 
-st.subheader("MODEL PERFORMANCE")
-st.metric(
-    label="MAE (Mean Absolute Error)",
-    value=round(mae, 2) if not pd.isna(mae) else None
-)

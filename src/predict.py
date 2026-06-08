@@ -30,12 +30,12 @@ if __name__ == "__main__":
 
     feature_cols = [
         col for col in df.columns
-        if col not in ["PTS", "Game_ID", "GAME_DATE", "Team_ID", "OPP_Team_ID", "is_new"]
+        if col not in ["PTS", "Game_ID", "GAME_DATE", "Team_ID", "OPP_Team_ID", "OPP_PTS", "is_new"]
     ]
 
     df["Predicted_PTS"] = model.predict(df[feature_cols])
 
-    preds = df[["GAME_DATE", "Game_ID", "Team_ID", "OPP_Team_ID", "PTS", "Predicted_PTS"]]
+    preds = df[["GAME_DATE", "Game_ID", "Team_ID", "OPP_Team_ID", "PTS", "OPP_PTS", "Predicted_PTS"]]
     
     preds.to_sql(
         name="predictions",
