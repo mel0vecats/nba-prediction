@@ -26,8 +26,7 @@ def fetch_historical_games(nba_teams, seasons, season_types):
                     gamelog = teamgamelog.TeamGameLog(
                         team_id=team_id,
                         season=season,
-                        season_type_all_star=season_type,
-                        timeout=300
+                        season_type_all_star=season_type
                     )
 
                     df = gamelog.get_data_frames()[0]
@@ -36,7 +35,7 @@ def fetch_historical_games(nba_teams, seasons, season_types):
 
                     all_games.append(df)
                     print(f"Appended {team_name} {season_type}")
-                    time.sleep(1)  # Avoid rate limiting
+                    time.sleep(1)
 
                 except Exception as e:
                     print(f"Error with {team_name} ({season}): {e}")
