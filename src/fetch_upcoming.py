@@ -1,7 +1,7 @@
 import pandas as pd
 from nba_api.stats.endpoints import scheduleleaguev2int
 from utils import load_config
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 import os
@@ -13,14 +13,25 @@ def fetch_upcoming_games(season, playoff_rounds):
 
     games_df["gameDate"] = pd.to_datetime(games_df["gameDate"])
 
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = pd.Timestamp(datetime.now().date())
 
-    filtered = games_df[games_df["gameDate"].dt.strftime("%Y-%m-%d") == today].copy()
+    filtered = pd.DataFrame()
+    days_ahead = 0
+    max_days_ahead = 10
 
-    # Remove unwanted games (All-Star, preseason, etc.)
-    filtered = filtered[
-        ~filtered["gameLabel"].str.contains("star|preseason", case=False, na=False)
-    ]
+    while filtered.empty and days_ahead <= max_days_ahead:
+        target_date = today + timedelta(days=days_ahead)
+
+        filtered = games_df[games_df["gameDate"].dt.date == target_date.date()].copy()
+
+        # Remove unwanted games
+        filtered = filtered[~filtered["gameLabel"].str.contains("star|preseason", case=False, na=False)]
+
+        if filtered.empty:
+            print(f"No games found on {target_date.date()}. Trying next day...")
+            days_ahead += 1
+        else:
+            print(f"Found {len(filtered)} game(s) on {target_date.date()}")
 
     filtered = filtered[
         [
@@ -101,4 +112,4 @@ if __name__ == "__main__":
         index=False
     )
 
-    print(f"Saved {len(upcoming_games)//2} historical games to Supabase table 'upcoming_table'")
+    print(f"Saved {len(upcoming_games)//2} upcoming games to Supabase table 'upcoming_table'")
