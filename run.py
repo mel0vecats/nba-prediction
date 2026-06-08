@@ -7,19 +7,29 @@ scripts = [
     "src/fetch_upcoming.py",
     "src/feature_engineering.py",
     "src/train.py",
-    "src/predict.py",
+    "src/predict.py"
 ]
 
-for script in scripts:
-    print(f"\nRunning {script}...")
-    result = subprocess.run([sys.executable, script], capture_output=True, text=True)
-    
-    print(result.stdout)
-    if result.stderr:
-        print(f"Errors in {script}:\n{result.stderr}")
-    
-    if result.returncode != 0:
-        print(f"{script} failed with exit code {result.returncode}. Stopping.")
-        sys.exit(result.returncode)
+def run_script(script):
+    print(f"\nRunning {script}\n", flush=True)
 
-print("\nAll scripts completed successfully.")
+    process = subprocess.Popen(
+        [sys.executable, "-u", script],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True
+    )
+
+    # stream logs live
+    for line in process.stdout:
+        print(line, end="", flush=True)
+
+    process.wait()
+
+    if process.returncode != 0:
+        raise RuntimeError(f"{script} failed with exit code {process.returncode}")
+
+for script in scripts:
+    run_script(script)
+
+print("\nAll scripts completed successfully!", flush=True)
