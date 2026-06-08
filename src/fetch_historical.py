@@ -26,7 +26,8 @@ def fetch_historical_games(nba_teams, seasons, season_types):
                     gamelog = teamgamelog.TeamGameLog(
                         team_id=team_id,
                         season=season,
-                        season_type_all_star=season_type
+                        season_type_all_star=season_type,
+                        timeout=300
                     )
 
                     df = gamelog.get_data_frames()[0]
