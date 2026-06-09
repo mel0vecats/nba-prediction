@@ -108,16 +108,18 @@ mae = filtered_completed["DIFFERENCE"].mean()
 
 
 # --- Display ---
-st.subheader("MODEL PERFORMANCE")
+st.title("NBA PREDICTION DASHBOARD")
+
+# st.subheader("MODEL PERFORMANCE")
 col1, col2 = st.columns(2)
 
 col1.metric("Win Accuracy", f"{round(win_accuracy, 2)}%" if not pd.isna(win_accuracy) else None)
 col2.metric("MAE", round(mae, 2) if not pd.isna(mae) else None)
 
-st.subheader("NEXT GAMES")
-st.dataframe(next_games_display, use_container_width=True)
+tab1, tab2 = st.tabs(["Next Games", "Final Results"])
 
-st.subheader("FINAL RESULTS")
-st.dataframe(completed_games_display, use_container_width=True)
+with tab1:
+    st.dataframe(next_games_display, use_container_width=True)
 
-
+with tab2:
+    st.dataframe(completed_games_display, use_container_width=True)
